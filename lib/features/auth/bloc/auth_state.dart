@@ -1,36 +1,51 @@
 import 'package:equatable/equatable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+sealed class AuthBlocState extends Equatable {
+  const AuthBlocState();
 
-abstract class AuthState extends Equatable {
-  const AuthState();
   @override
   List<Object?> get props => [];
 }
 
-class AuthInitial extends AuthState {}
+final class AuthInitial extends AuthBlocState {}
 
-class AuthLoading extends AuthState {}
+final class AuthLoading extends AuthBlocState {}
 
-class AuthAuthenticated extends AuthState {
+final class AuthAuthenticated extends AuthBlocState {
   final User user;
+
   const AuthAuthenticated(this.user);
+
   @override
   List<Object?> get props => [user];
 }
 
-class AuthUnauthenticated extends AuthState {}
+final class AuthUnauthenticated extends AuthBlocState {}
 
-class AuthError extends AuthState {
+final class AuthOtpVerificationRequired extends AuthBlocState {
+  final String email;
+
+  const AuthOtpVerificationRequired(this.email);
+
+  @override
+  List<Object?> get props => [email];
+}
+
+final class AuthError extends AuthBlocState {
   final String message;
+
   const AuthError(this.message);
+
   @override
   List<Object?> get props => [message];
 }
 
-class AuthActionSuccess extends AuthState {
+final class AuthActionSuccess extends AuthBlocState {
   final String message;
+
   const AuthActionSuccess(this.message);
+
   @override
   List<Object?> get props => [message];
 }

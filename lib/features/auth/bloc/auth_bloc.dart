@@ -1,67 +1,65 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'auth_event.dart';
-import 'auth_state.dart' hide AuthState;
+import 'auth_state.dart';
 
-class AuthBloc extends Bloc<AuthEvent, AuthState> {
+class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
   final SupabaseClient _supabaseClient = Supabase.instance.client;
 
-  AuthBloc() : super(AuthInitial() as AuthState) {
+  AuthBloc() : super(AuthInitial()) {
     on<AuthInitialize>(_onInitialize);
     on<AuthSignInRequested>(_onSignInRequested);
     on<AuthSignUpRequested>(_onSignUpRequested);
+    on<AuthVerifyOtpRequested>(_onVerifyOtpRequested);
     on<AuthSignOutRequested>(_onSignOutRequested);
     on<AuthResetPasswordRequested>(_onResetPasswordRequested);
 
-    // Слушаем изменения состояния авторизации Supabase
     _supabaseClient.auth.onAuthStateChange.listen((data) {
       final session = data.session;
       if (session != null) {
-        add(AuthInitialize()); // Перепроверяем состояние при изменении
+        add(AuthInitialize());
       } else {
         add(AuthSignOutRequested());
       }
     });
   }
 
-  void _onInitialize(AuthInitialize event, Emitter<AuthState> emit) {
+  void _onInitialize(AuthInitialize event, Emitter<AuthBlocState> emit) {
     final session = _supabaseClient.auth.currentSession;
     if (session != null) {
-      emit(AuthAuthenticated(session.user) as AuthState);
+      emit(AuthAuthenticated(session.user));
     } else {
-      emit(AuthUnauthenticated() as AuthState);
+      emit(AuthUnauthenticated());
     }
   }
 
   Future<void> _onSignInRequested(
     AuthSignInRequested event,
-    Emitter<AuthState> emit,
+    Emitter<AuthBlocState> emit,
   ) async {
-    emit(AuthLoading() as AuthState);
+    emit(AuthLoading());
     try {
       final response = await _supabaseClient.auth.signInWithPassword(
         email: event.email,
         password: event.password,
       );
       if (response.user != null) {
-        emit(AuthAuthenticated(response.user!) as AuthState);
+        emit(AuthAuthenticated(response.user!));
       } else {
-        emit(
-          const AuthError('Ошибка входа: пользователь не найден') as AuthState,
-        );
+        emit(const AuthError('Пользователь не найден'));
       }
     } on AuthException catch (e) {
-      emit(AuthError(e.message) as AuthState);
+      emit(AuthError(e.message));
     } catch (e) {
-      emit(AuthError(e.toString()) as AuthState);
+      emit(AuthError(e.toString()));
     }
   }
 
   Future<void> _onSignUpRequested(
     AuthSignUpRequested event,
-    Emitter<AuthState> emit,
+    Emitter<AuthBlocState> emit,
   ) async {
-    emit(AuthLoading() as AuthState);
+    emit(AuthLoading());
     try {
       await _supabaseClient.auth.signUp(
         email: event.email,
@@ -71,51 +69,62 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           'last_name': event.lastName,
           'middle_name': event.middleName ?? '',
           'birth_date': event.birthDate.toIso8601String().split('T')[0],
-          // Форматируем дату
           'gender': event.gender,
           'phone': event.phone ?? '',
         },
       );
-      // Supabase по умолчанию отправляет письмо с подтверждением
-      emit(
-        const AuthActionSuccess(
-              'Регистрация успешна! Пожалуйста, проверьте вашу почту для подтверждения.',
-            )
-            as AuthState,
-      );
+      emit(AuthOtpVerificationRequired(event.email));
     } on AuthException catch (e) {
-      emit(AuthError(e.message) as AuthState);
+      emit(AuthError(e.message));
     } catch (e) {
-      emit(AuthError(e.toString()) as AuthState);
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  Future<void> _onVerifyOtpRequested(
+    AuthVerifyOtpRequested event,
+    Emitter<AuthBlocState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      final response = await _supabaseClient.auth.verifyOTP(
+        email: event.email,
+        token: event.code,
+        type: OtpType.signup,
+      );
+      if (response.user != null) {
+        emit(AuthAuthenticated(response.user!));
+      } else {
+        emit(const AuthError('Неверный код'));
+      }
+    } on AuthException catch (e) {
+      emit(AuthError(e.message));
+    } catch (e) {
+      emit(AuthError(e.toString()));
     }
   }
 
   Future<void> _onSignOutRequested(
     AuthSignOutRequested event,
-    Emitter<AuthState> emit,
+    Emitter<AuthBlocState> emit,
   ) async {
-    emit(AuthLoading() as AuthState);
+    emit(AuthLoading());
     await _supabaseClient.auth.signOut();
-    emit(AuthUnauthenticated() as AuthState);
+    emit(AuthUnauthenticated());
   }
 
   Future<void> _onResetPasswordRequested(
     AuthResetPasswordRequested event,
-    Emitter<AuthState> emit,
+    Emitter<AuthBlocState> emit,
   ) async {
-    emit(AuthLoading() as AuthState);
+    emit(AuthLoading());
     try {
       await _supabaseClient.auth.resetPasswordForEmail(event.email);
-      emit(
-        const AuthActionSuccess(
-              'Ссылка для сброса пароля отправлена на вашу почту.',
-            )
-            as AuthState,
-      );
+      emit(const AuthActionSuccess('Код восстановления отправлен на почту.'));
     } on AuthException catch (e) {
-      emit(AuthError(e.message) as AuthState);
+      emit(AuthError(e.message));
     } catch (e) {
-      emit(AuthError(e.toString()) as AuthState);
+      emit(AuthError(e.toString()));
     }
   }
 }
