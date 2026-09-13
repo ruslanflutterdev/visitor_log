@@ -4,7 +4,7 @@ name: Flutter Web Deploy
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build_and_deploy:
@@ -28,7 +28,7 @@ jobs:
       # 4. Собираем Web-версию приложения
       # Замените 'ваш_github_username/название_репозитория' на ваши данные
       - name: Build Web
-        run: flutter build web --base-href "visitor_log"
+        run: flutter build web --base-href "/visitor_log/"
 
       # 5. Публикуем результат в ветку gh-pages
       - name: Deploy to GitHub Pages
