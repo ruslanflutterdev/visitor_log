@@ -3,19 +3,27 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../features/auth/screens/auth_screen.dart';
 import '../../features/groups/groups_screen.dart';
-
+import '../../features/auth/screens/register_screen.dart';
+import '../../features/auth/screens/recovery_screen.dart';
+import '../../features/auth/screens/otp_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
   redirect: (BuildContext context, GoRouterState state) {
     final Session? session = Supabase.instance.client.auth.currentSession;
-    final bool isLoggingIn = state.matchedLocation == '/';
+    final loc = state.matchedLocation;
 
-    if (session == null && !isLoggingIn) {
+    final bool isAuthScreen =
+        loc == '/' ||
+        loc == '/register' ||
+        loc == '/recovery' ||
+        loc.startsWith('/otp');
+
+    if (session == null && !isAuthScreen) {
       return '/';
     }
 
-    if (session != null && isLoggingIn) {
+    if (session != null && isAuthScreen) {
       return '/groups';
     }
 
@@ -32,6 +40,25 @@ final GoRouter appRouter = GoRouter(
       path: '/groups',
       builder: (BuildContext context, GoRouterState state) {
         return const GroupsScreen();
+      },
+    ),
+    GoRoute(
+      path: '/register',
+      builder: (BuildContext context, GoRouterState state) {
+        return const RegisterScreen();
+      },
+    ),
+    GoRoute(
+      path: '/recovery',
+      builder: (BuildContext context, GoRouterState state) {
+        return const RecoveryScreen();
+      },
+    ),
+    GoRoute(
+      path: '/otp/:email',
+      builder: (BuildContext context, GoRouterState state) {
+        final email = state.pathParameters['email']!;
+        return OtpScreen(email: email);
       },
     ),
   ],

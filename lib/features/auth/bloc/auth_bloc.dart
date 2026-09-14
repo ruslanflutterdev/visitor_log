@@ -19,7 +19,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
       if (session != null) {
         add(AuthInitialize());
       } else {
-        add(AuthSignOutRequested());
+        add(AuthInitialize());
       }
     });
   }

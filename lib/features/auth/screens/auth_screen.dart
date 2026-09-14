@@ -28,13 +28,11 @@ class _AuthScreenState extends State<AuthScreen> {
     final password = _passwordController.text.trim();
 
     if (email.isNotEmpty && password.isNotEmpty) {
-      context.read<AuthBloc>().add(
-        AuthSignInRequested(email, password),
-      );
+      context.read<AuthBloc>().add(AuthSignInRequested(email, password));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Заполните все поля')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Заполните все поля')));
     }
   }
 
@@ -71,10 +69,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   const Text(
                     'Журнал посещений',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 32),
                   CustomTextField(
@@ -95,21 +90,18 @@ class _AuthScreenState extends State<AuthScreen> {
                     onPressed: isLoading ? null : _onSignInPressed,
                     child: isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                      'Войти',
-                      style: TextStyle(fontSize: 16),
-                    ),
+                        : const Text('Войти', style: TextStyle(fontSize: 16)),
                   ),
                   const SizedBox(height: 16),
                   TextButton(
                     onPressed: () {
-                      // TODO: Переход на экран восстановления пароля
+                      context.push('/recovery');
                     },
                     child: const Text('Забыли пароль?'),
                   ),
                   TextButton(
                     onPressed: () {
-                      // TODO: Переход на экран регистрации
+                      context.push('/register');
                     },
                     child: const Text('Регистрация'),
                   ),
