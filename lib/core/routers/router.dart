@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../features/auth/screens/auth_screen.dart';
-import '../../features/groups/groups_screen.dart';
+import '../../features/dashboard/dashboard_screen.dart';
 import '../../features/auth/screens/register_screen.dart';
 import '../../features/auth/screens/recovery_screen.dart';
 import '../../features/auth/screens/otp_screen.dart';
@@ -37,9 +37,9 @@ final GoRouter appRouter = GoRouter(
       },
     ),
     GoRoute(
-      path: '/groups',
+      path: '/dashboard',
       builder: (BuildContext context, GoRouterState state) {
-        return const GroupsScreen();
+        return const DashboardScreen();
       },
     ),
     GoRoute(

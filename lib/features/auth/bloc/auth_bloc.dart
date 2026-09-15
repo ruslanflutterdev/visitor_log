@@ -24,19 +24,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
     });
   }
 
-  void _onInitialize(AuthInitialize event, Emitter<AuthBlocState> emit) {
+  Future<void> _onInitialize(AuthInitialize event, Emitter<AuthBlocState> emit) async {
     final session = _supabaseClient.auth.currentSession;
     if (session != null) {
-      emit(AuthAuthenticated(session.user));
+      await _emitAuthenticated(session.user, emit);
     } else {
       emit(AuthUnauthenticated());
     }
   }
 
-  Future<void> _onSignInRequested(
-    AuthSignInRequested event,
-    Emitter<AuthBlocState> emit,
-  ) async {
+  Future<void> _onSignInRequested(AuthSignInRequested event, Emitter<AuthBlocState> emit) async {
     emit(AuthLoading());
     try {
       final response = await _supabaseClient.auth.signInWithPassword(
@@ -44,7 +41,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
         password: event.password,
       );
       if (response.user != null) {
-        emit(AuthAuthenticated(response.user!));
+        await _emitAuthenticated(response.user!, emit);
       } else {
         emit(const AuthError('Пользователь не найден'));
       }
@@ -81,10 +78,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
     }
   }
 
-  Future<void> _onVerifyOtpRequested(
-    AuthVerifyOtpRequested event,
-    Emitter<AuthBlocState> emit,
-  ) async {
+  Future<void> _onVerifyOtpRequested(AuthVerifyOtpRequested event, Emitter<AuthBlocState> emit) async {
     emit(AuthLoading());
     try {
       final response = await _supabaseClient.auth.verifyOTP(
@@ -93,7 +87,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
         type: OtpType.signup,
       );
       if (response.user != null) {
-        emit(AuthAuthenticated(response.user!));
+        await _emitAuthenticated(response.user!, emit);
       } else {
         emit(const AuthError('Неверный код'));
       }
@@ -125,6 +119,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
       emit(AuthError(e.message));
     } catch (e) {
       emit(AuthError(e.toString()));
+    }
+  }
+
+  Future<void> _emitAuthenticated(User user, Emitter<AuthBlocState> emit) async {
+    try {
+      final response = await _supabaseClient
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+
+      emit(AuthAuthenticated(user, response['role'] as String));
+    } catch (e) {
+      emit(const AuthError('Ошибка загрузки профиля. Попробуйте перезайти.'));
     }
   }
 }
