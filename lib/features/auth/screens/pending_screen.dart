@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/widgets/custom_app_bar.dart';
 
-
 class PendingScreen extends StatelessWidget {
   const PendingScreen({super.key});
 

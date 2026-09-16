@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import '../../features/auth/bloc/auth_bloc.dart';
 import '../../features/auth/bloc/auth_event.dart';
 
@@ -25,7 +24,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           tooltip: 'Выйти',
           onPressed: () {
             context.read<AuthBloc>().add(AuthSignOutRequested());
-            context.go('/');
           },
         ),
       ],

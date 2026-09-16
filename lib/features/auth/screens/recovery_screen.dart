@@ -46,7 +46,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                 backgroundColor: Colors.green,
               ),
             );
-            context.pop();
+            context.push('/otp/${_emailController.text.trim()}?recovery=true');
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

@@ -8,8 +8,9 @@ import '../bloc/auth_state.dart';
 
 class OtpScreen extends StatefulWidget {
   final String email;
+  final bool isRecovery;
 
-  const OtpScreen({super.key, required this.email});
+  const OtpScreen({super.key, required this.email, this.isRecovery = false});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -27,7 +28,9 @@ class _OtpScreenState extends State<OtpScreen> {
   void _onVerifyPressed() {
     final code = _codeController.text.trim();
     if (code.length >= 6) {
-      context.read<AuthBloc>().add(AuthVerifyOtpRequested(widget.email, code));
+      context.read<AuthBloc>().add(
+          AuthVerifyOtpRequested(widget.email, code, isRecovery: widget.isRecovery)
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -45,12 +48,13 @@ class _OtpScreenState extends State<OtpScreen> {
         listener: (context, state) {
           if (state is AuthAuthenticated) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Успешно!'),
-                backgroundColor: Colors.green,
-              ),
+              const SnackBar(content: Text('Успешно!'), backgroundColor: Colors.green),
             );
-            context.go('/dashboard');
+            if (widget.isRecovery) {
+              context.go('/update-password');
+            } else {
+              context.go('/dashboard');
+            }
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

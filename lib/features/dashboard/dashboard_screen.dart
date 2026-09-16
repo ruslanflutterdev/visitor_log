@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../core/widgets/custom_app_bar.dart';
 import '../auth/bloc/auth_bloc.dart';
 import '../auth/bloc/auth_state.dart';
 import '../auth/screens/pending_screen.dart';
@@ -16,9 +17,11 @@ class DashboardScreen extends StatelessWidget {
           if (state.role == 'pending') {
             return const PendingScreen();
           } else if (state.role == 'admin' || state.role == 'senior_coach') {
-            // TODO: Вернем панель администратора (список тренеров)
-            return const Center(
-              child: Text('Здесь будет панель Администратора'),
+            return const Scaffold(
+              appBar: CustomAppBar(title: 'Панель администратора'),
+              body: Center(
+                child: Text('Здесь будет панель администратора'),
+              ),
             );
           } else {
             // Обычный подтвержденный тренер

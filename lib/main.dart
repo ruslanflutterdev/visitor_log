@@ -5,15 +5,14 @@ import 'package:visitor_log/core/routers/router.dart';
 import 'package:visitor_log/features/auth/bloc/auth_bloc.dart';
 import 'package:visitor_log/features/auth/bloc/auth_event.dart';
 import 'core/theme/app_theme.dart';
+import 'core/widgets/session_timeout_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Supabase.initialize(
     url: 'https://munhsuotwasnxxlkacaq.supabase.co',
     publishableKey: 'sb_publishable_nlN3t9hQtcBNnGGOd4aCDw_dt11pbG4',
   );
-
   runApp(const VisitorLogApp());
 }
 
@@ -24,10 +23,13 @@ class VisitorLogApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => AuthBloc()..add(AuthInitialize()),
-      child: MaterialApp.router(
-        title: 'Visitor Log',
-        theme: AppTheme.lightTheme,
-        routerConfig: appRouter,
+      child: SessionTimeoutManager(
+        timeoutDuration: const Duration(minutes: 30),
+        child: MaterialApp.router(
+          title: 'Visitor Log',
+          theme: AppTheme.lightTheme,
+          routerConfig: appRouter,
+        ),
       ),
     );
   }

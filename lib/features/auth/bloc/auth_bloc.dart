@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/utils/auth_error_translator.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
@@ -13,6 +14,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
     on<AuthVerifyOtpRequested>(_onVerifyOtpRequested);
     on<AuthSignOutRequested>(_onSignOutRequested);
     on<AuthResetPasswordRequested>(_onResetPasswordRequested);
+    on<AuthUpdatePasswordRequested>(_onUpdatePasswordRequested);
 
     _supabaseClient.auth.onAuthStateChange.listen((data) {
       final session = data.session;
@@ -52,7 +54,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
         emit(const AuthError('Пользователь не найден'));
       }
     } on AuthException catch (e) {
-      emit(AuthError(_translateAuthError(e)));
+      emit(AuthError(translateAuthError(e)));
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -78,22 +80,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
       );
       emit(AuthOtpVerificationRequired(event.email));
     } on AuthException catch (e) {
-      emit(AuthError(_translateAuthError(e)));
+      emit(AuthError(translateAuthError(e)));
     } catch (e) {
       emit(AuthError(e.toString()));
     }
   }
 
   Future<void> _onVerifyOtpRequested(
-    AuthVerifyOtpRequested event,
-    Emitter<AuthBlocState> emit,
-  ) async {
+      AuthVerifyOtpRequested event,
+      Emitter<AuthBlocState> emit,
+      ) async {
     emit(AuthLoading());
     try {
       final response = await _supabaseClient.auth.verifyOTP(
         email: event.email,
         token: event.code,
-        type: OtpType.signup,
+        type: event.isRecovery ? OtpType.recovery : OtpType.signup,
       );
       if (response.user != null) {
         await _emitAuthenticated(response.user!, emit);
@@ -101,7 +103,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
         emit(const AuthError('Неверный код'));
       }
     } on AuthException catch (e) {
-      emit(AuthError(_translateAuthError(e)));
+      emit(AuthError(translateAuthError(e)));
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -125,7 +127,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
       await _supabaseClient.auth.resetPasswordForEmail(event.email);
       emit(const AuthActionSuccess('Код восстановления отправлен на почту.'));
     } on AuthException catch (e) {
-      emit(AuthError(_translateAuthError(e)));
+      emit(AuthError(translateAuthError(e)));
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -148,20 +150,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
     }
   }
 
-  String _translateAuthError(AuthException e) {
-    final msg = e.message.toLowerCase();
-
-    if (msg.contains('invalid login credentials')) {
-      return 'Неверный email или пароль. Проверьте данные.';
-    } else if (msg.contains('user already registered')) {
-      return 'Пользователь с таким email уже существует.';
-    } else if (msg.contains('password should be at least')) {
-      return 'Пароль слишком простой или короткий.';
-    } else if (msg.contains('rate limit exceeded')) {
-      return 'Слишком много попыток отправки. Попробуйте позже.';
-    } else if (msg.contains('token has expired or is invalid') || msg.contains('invalid otp')) {
-      return 'Неверный или устаревший код подтверждения.';
+  Future<void> _onUpdatePasswordRequested(
+      AuthUpdatePasswordRequested event,
+      Emitter<AuthBlocState> emit,
+      ) async {
+    emit(AuthLoading());
+    try {
+      await _supabaseClient.auth.updateUser(
+        UserAttributes(password: event.newPassword),
+      );
+      emit(const AuthActionSuccess('Пароль успешно обновлен.'));
+    } on AuthException catch (e) {
+      emit(AuthError(translateAuthError(e)));
+    } catch (e) {
+      emit(AuthError(e.toString()));
     }
-    return 'Ошибка: ${e.message}';
   }
 }

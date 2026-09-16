@@ -56,11 +56,12 @@ final class AuthSignUpRequested extends AuthEvent {
 final class AuthVerifyOtpRequested extends AuthEvent {
   final String email;
   final String code;
+  final bool isRecovery;
 
-  const AuthVerifyOtpRequested(this.email, this.code);
+  const AuthVerifyOtpRequested(this.email, this.code, {this.isRecovery = false});
 
   @override
-  List<Object?> get props => [email, code];
+  List<Object?> get props => [email, code, isRecovery];
 }
 
 final class AuthSignOutRequested extends AuthEvent {}
@@ -72,4 +73,11 @@ final class AuthResetPasswordRequested extends AuthEvent {
 
   @override
   List<Object?> get props => [email];
+}
+
+final class AuthUpdatePasswordRequested extends AuthEvent {
+  final String newPassword;
+  const AuthUpdatePasswordRequested(this.newPassword);
+  @override
+  List<Object?> get props => [newPassword];
 }
