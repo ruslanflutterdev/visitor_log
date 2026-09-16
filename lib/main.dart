@@ -5,11 +5,9 @@ import 'package:visitor_log/core/routers/router.dart';
 import 'package:visitor_log/features/auth/bloc/auth_bloc.dart';
 import 'package:visitor_log/features/auth/bloc/auth_event.dart';
 import 'core/theme/app_theme.dart';
-import 'package:flutter_web_plugins/url_strategy.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  usePathUrlStrategy();
 
   await Supabase.initialize(
     url: 'https://munhsuotwasnxxlkacaq.supabase.co',

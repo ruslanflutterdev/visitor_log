@@ -24,7 +24,7 @@ final GoRouter appRouter = GoRouter(
     }
 
     if (session != null && isAuthScreen) {
-      return '/groups';
+      return '/dashboard';
     }
 
     return null;
