@@ -26,12 +26,14 @@ class _OtpScreenState extends State<OtpScreen> {
 
   void _onVerifyPressed() {
     final code = _codeController.text.trim();
-    if (code.length == 6) {
+    if (code.length >= 6) {
       context.read<AuthBloc>().add(AuthVerifyOtpRequested(widget.email, code));
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Введите 6-значный код')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Введите корректный код (минимум 6 цифр)'),
+        ),
+      );
     }
   }
 
@@ -74,7 +76,7 @@ class _OtpScreenState extends State<OtpScreen> {
                 const SizedBox(height: 24),
                 CustomTextField(
                   controller: _codeController,
-                  labelText: '6-значный код',
+                  labelText: 'Код из письма',
                   keyboardType: TextInputType.number,
                 ),
                 const SizedBox(height: 24),

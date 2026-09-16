@@ -24,7 +24,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
     });
   }
 
-  Future<void> _onInitialize(AuthInitialize event, Emitter<AuthBlocState> emit) async {
+  Future<void> _onInitialize(
+    AuthInitialize event,
+    Emitter<AuthBlocState> emit,
+  ) async {
     final session = _supabaseClient.auth.currentSession;
     if (session != null) {
       await _emitAuthenticated(session.user, emit);
@@ -33,7 +36,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
     }
   }
 
-  Future<void> _onSignInRequested(AuthSignInRequested event, Emitter<AuthBlocState> emit) async {
+  Future<void> _onSignInRequested(
+    AuthSignInRequested event,
+    Emitter<AuthBlocState> emit,
+  ) async {
     emit(AuthLoading());
     try {
       final response = await _supabaseClient.auth.signInWithPassword(
@@ -78,7 +84,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
     }
   }
 
-  Future<void> _onVerifyOtpRequested(AuthVerifyOtpRequested event, Emitter<AuthBlocState> emit) async {
+  Future<void> _onVerifyOtpRequested(
+    AuthVerifyOtpRequested event,
+    Emitter<AuthBlocState> emit,
+  ) async {
     emit(AuthLoading());
     try {
       final response = await _supabaseClient.auth.verifyOTP(
@@ -122,7 +131,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
     }
   }
 
-  Future<void> _emitAuthenticated(User user, Emitter<AuthBlocState> emit) async {
+  Future<void> _emitAuthenticated(
+    User user,
+    Emitter<AuthBlocState> emit,
+  ) async {
     try {
       final response = await _supabaseClient
           .from('profiles')

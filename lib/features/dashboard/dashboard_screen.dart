@@ -17,16 +17,16 @@ class DashboardScreen extends StatelessWidget {
             return const PendingScreen();
           } else if (state.role == 'admin' || state.role == 'senior_coach') {
             // TODO: Вернем панель администратора (список тренеров)
-            return const Center(child: Text('Здесь будет панель Администратора'));
+            return const Center(
+              child: Text('Здесь будет панель Администратора'),
+            );
           } else {
             // Обычный подтвержденный тренер
             return const GroupsScreen();
           }
         }
 
-        return const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        );
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
       },
     );
   }
