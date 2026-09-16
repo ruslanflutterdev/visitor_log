@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/auth_bloc.dart';
-import '../bloc/auth_event.dart';
+import '../../../core/widgets/custom_app_bar.dart';
+
 
 class PendingScreen extends StatelessWidget {
   const PendingScreen({super.key});
@@ -9,17 +8,7 @@ class PendingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Ожидание подтверждения'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              context.read<AuthBloc>().add(AuthSignOutRequested());
-            },
-          ),
-        ],
-      ),
+      appBar: CustomAppBar(title: 'Ожидание подтверждения'),
       body: const Padding(
         padding: EdgeInsets.all(32.0),
         child: Column(

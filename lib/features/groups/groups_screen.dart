@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../core/widgets/custom_app_bar.dart';
+
 
 class GroupsScreen extends StatelessWidget {
   const GroupsScreen({super.key});
@@ -7,17 +8,7 @@ class GroupsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Группы'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              Supabase.instance.client.auth.signOut();
-            },
-          ),
-        ],
-      ),
+      appBar: CustomAppBar(title: 'Мои группы'),
       body: const Center(child: Text('Здесь будет список групп')),
     );
   }

@@ -42,7 +42,9 @@ class _AuthScreenState extends State<AuthScreen> {
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthBlocState>(
         listener: (context, state) {
-          if (state is AuthError) {
+          if (state is AuthAuthenticated) {
+            context.go('/dashboard');
+          } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),

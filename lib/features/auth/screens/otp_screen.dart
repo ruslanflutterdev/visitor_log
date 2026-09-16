@@ -50,6 +50,7 @@ class _OtpScreenState extends State<OtpScreen> {
                 backgroundColor: Colors.green,
               ),
             );
+            context.go('/dashboard');
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
