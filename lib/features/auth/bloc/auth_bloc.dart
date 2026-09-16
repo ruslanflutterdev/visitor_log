@@ -52,7 +52,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
         emit(const AuthError('Пользователь не найден'));
       }
     } on AuthException catch (e) {
-      emit(AuthError(e.message));
+      emit(AuthError(_translateAuthError(e)));
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -78,7 +78,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
       );
       emit(AuthOtpVerificationRequired(event.email));
     } on AuthException catch (e) {
-      emit(AuthError(e.message));
+      emit(AuthError(_translateAuthError(e)));
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -101,7 +101,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
         emit(const AuthError('Неверный код'));
       }
     } on AuthException catch (e) {
-      emit(AuthError(e.message));
+      emit(AuthError(_translateAuthError(e)));
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -125,7 +125,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
       await _supabaseClient.auth.resetPasswordForEmail(event.email);
       emit(const AuthActionSuccess('Код восстановления отправлен на почту.'));
     } on AuthException catch (e) {
-      emit(AuthError(e.message));
+      emit(AuthError(_translateAuthError(e)));
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -146,5 +146,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
     } catch (e) {
       emit(const AuthError('Ошибка загрузки профиля. Попробуйте перезайти.'));
     }
+  }
+
+  String _translateAuthError(AuthException e) {
+    final msg = e.message.toLowerCase();
+
+    if (msg.contains('invalid login credentials')) {
+      return 'Неверный email или пароль. Проверьте данные.';
+    } else if (msg.contains('user already registered')) {
+      return 'Пользователь с таким email уже существует.';
+    } else if (msg.contains('password should be at least')) {
+      return 'Пароль слишком простой или короткий.';
+    } else if (msg.contains('rate limit exceeded')) {
+      return 'Слишком много попыток отправки. Попробуйте позже.';
+    } else if (msg.contains('token has expired or is invalid') || msg.contains('invalid otp')) {
+      return 'Неверный или устаревший код подтверждения.';
+    }
+    return 'Ошибка: ${e.message}';
   }
 }

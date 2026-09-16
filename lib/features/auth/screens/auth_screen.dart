@@ -17,6 +17,8 @@ class _AuthScreenState extends State<AuthScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  bool _obscurePassword = true;
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -85,8 +87,13 @@ class _AuthScreenState extends State<AuthScreen> {
                   CustomTextField(
                     controller: _passwordController,
                     labelText: 'Пароль',
-                    obscureText: true,
+                    obscureText: _obscurePassword,
                     prefixIcon: Icons.lock_outline,
+                    textInputAction: TextInputAction.done,
+                    suffixIcon: IconButton(
+                      icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    ),
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton(
