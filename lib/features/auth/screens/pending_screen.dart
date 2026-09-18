@@ -7,7 +7,7 @@ class PendingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: 'Ожидание подтверждения'),
+      appBar: CustomAppBar(titleWidget: const Text('Ожидание подтверждения')),
       body: const Padding(
         padding: EdgeInsets.all(32.0),
         child: Column(

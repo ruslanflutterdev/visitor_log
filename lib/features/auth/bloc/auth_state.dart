@@ -15,11 +15,13 @@ final class AuthLoading extends AuthBlocState {}
 final class AuthAuthenticated extends AuthBlocState {
   final User user;
   final String role;
+  final String firstName;
+  final String lastName;
 
-  const AuthAuthenticated(this.user, this.role);
+  const AuthAuthenticated(this.user, this.role, this.firstName, this.lastName);
 
   @override
-  List<Object?> get props => [user, role];
+  List<Object?> get props => [user, role, firstName, lastName];
 }
 
 final class AuthUnauthenticated extends AuthBlocState {}

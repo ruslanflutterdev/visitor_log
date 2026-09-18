@@ -58,7 +58,11 @@ final class AuthVerifyOtpRequested extends AuthEvent {
   final String code;
   final bool isRecovery;
 
-  const AuthVerifyOtpRequested(this.email, this.code, {this.isRecovery = false});
+  const AuthVerifyOtpRequested(
+    this.email,
+    this.code, {
+    this.isRecovery = false,
+  });
 
   @override
   List<Object?> get props => [email, code, isRecovery];

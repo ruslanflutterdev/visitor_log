@@ -87,9 +87,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
   }
 
   Future<void> _onVerifyOtpRequested(
-      AuthVerifyOtpRequested event,
-      Emitter<AuthBlocState> emit,
-      ) async {
+    AuthVerifyOtpRequested event,
+    Emitter<AuthBlocState> emit,
+  ) async {
     emit(AuthLoading());
     try {
       final response = await _supabaseClient.auth.verifyOTP(
@@ -140,20 +140,27 @@ class AuthBloc extends Bloc<AuthEvent, AuthBlocState> {
     try {
       final response = await _supabaseClient
           .from('profiles')
-          .select('role')
+          .select('role, first_name, last_name')
           .eq('id', user.id)
           .single();
 
-      emit(AuthAuthenticated(user, response['role'] as String));
+      emit(
+        AuthAuthenticated(
+          user,
+          response['role'] as String,
+          response['first_name'] as String? ?? '',
+          response['last_name'] as String? ?? '',
+        ),
+      );
     } catch (e) {
-      emit(const AuthError('Ошибка загрузки профиля. Попробуйте перезайти.'));
+      emit(const AuthError('Ошибка загрузки профиля.'));
     }
   }
 
   Future<void> _onUpdatePasswordRequested(
-      AuthUpdatePasswordRequested event,
-      Emitter<AuthBlocState> emit,
-      ) async {
+    AuthUpdatePasswordRequested event,
+    Emitter<AuthBlocState> emit,
+  ) async {
     emit(AuthLoading());
     try {
       await _supabaseClient.auth.updateUser(

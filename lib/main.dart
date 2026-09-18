@@ -6,6 +6,8 @@ import 'package:visitor_log/features/auth/bloc/auth_bloc.dart';
 import 'package:visitor_log/features/auth/bloc/auth_event.dart';
 import 'core/theme/app_theme.dart';
 import 'core/widgets/session_timeout_manager.dart';
+import 'features/groups/bloc/groups_bloc.dart';
+import 'features/groups/bloc/groups_event.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,8 +23,11 @@ class VisitorLogApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AuthBloc()..add(AuthInitialize()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => AuthBloc()..add(AuthInitialize())),
+        BlocProvider(create: (context) => GroupsBloc()..add(LoadGroups())),
+      ],
       child: SessionTimeoutManager(
         timeoutDuration: const Duration(minutes: 30),
         child: MaterialApp.router(

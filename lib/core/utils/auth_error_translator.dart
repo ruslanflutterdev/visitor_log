@@ -10,7 +10,8 @@ String translateAuthError(AuthException e) {
     return 'Пароль слишком простой или короткий.';
   } else if (msg.contains('rate limit exceeded')) {
     return 'Слишком много попыток отправки. Попробуйте позже.';
-  } else if (msg.contains('token has expired or is invalid') || msg.contains('invalid otp')) {
+  } else if (msg.contains('token has expired or is invalid') ||
+      msg.contains('invalid otp')) {
     return 'Неверный или устаревший код подтверждения.';
   }
   return 'Ошибка: ${e.message}';

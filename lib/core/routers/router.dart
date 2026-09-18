@@ -20,9 +20,9 @@ final GoRouter appRouter = GoRouter(
 
     final bool isAuthScreen =
         loc == '/' ||
-            loc == '/register' ||
-            loc == '/recovery' ||
-            loc.startsWith('/otp');
+        loc == '/register' ||
+        loc == '/recovery' ||
+        loc.startsWith('/otp');
 
     if (session == null && !isAuthScreen) {
       return '/';

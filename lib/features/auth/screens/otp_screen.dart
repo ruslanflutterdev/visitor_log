@@ -29,7 +29,11 @@ class _OtpScreenState extends State<OtpScreen> {
     final code = _codeController.text.trim();
     if (code.length >= 6) {
       context.read<AuthBloc>().add(
-          AuthVerifyOtpRequested(widget.email, code, isRecovery: widget.isRecovery)
+        AuthVerifyOtpRequested(
+          widget.email,
+          code,
+          isRecovery: widget.isRecovery,
+        ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -48,7 +52,10 @@ class _OtpScreenState extends State<OtpScreen> {
         listener: (context, state) {
           if (state is AuthAuthenticated) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Успешно!'), backgroundColor: Colors.green),
+              const SnackBar(
+                content: Text('Успешно!'),
+                backgroundColor: Colors.green,
+              ),
             );
             if (widget.isRecovery) {
               context.go('/update-password');

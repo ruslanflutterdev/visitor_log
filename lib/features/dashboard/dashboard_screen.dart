@@ -4,7 +4,7 @@ import '../../core/widgets/custom_app_bar.dart';
 import '../auth/bloc/auth_bloc.dart';
 import '../auth/bloc/auth_state.dart';
 import '../auth/screens/pending_screen.dart';
-import '../groups/groups_screen.dart';
+import '../groups/screens/groups_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -14,18 +14,17 @@ class DashboardScreen extends StatelessWidget {
     return BlocBuilder<AuthBloc, AuthBlocState>(
       builder: (context, state) {
         if (state is AuthAuthenticated) {
+          final fullName = '${state.lastName} ${state.firstName}'.trim();
+
           if (state.role == 'pending') {
             return const PendingScreen();
           } else if (state.role == 'admin' || state.role == 'senior_coach') {
-            return const Scaffold(
-              appBar: CustomAppBar(title: 'Панель администратора'),
-              body: Center(
-                child: Text('Здесь будет панель администратора'),
-              ),
+            return Scaffold(
+              appBar: CustomAppBar(titleWidget: Text(fullName)), // Выводим имя
+              body: const Center(child: Text('Панель администратора')),
             );
           } else {
-            // Обычный подтвержденный тренер
-            return const GroupsScreen();
+            return GroupsScreen(coachName: fullName);
           }
         }
 

@@ -16,12 +16,18 @@ class RegisterScreen extends StatelessWidget {
         listener: (context, state) {
           if (state is AuthOtpVerificationRequired) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Код отправлен на почту'), backgroundColor: Colors.green),
+              const SnackBar(
+                content: Text('Код отправлен на почту'),
+                backgroundColor: Colors.green,
+              ),
             );
             context.go('/otp/${state.email}');
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message), backgroundColor: Colors.redAccent),
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.redAccent,
+              ),
             );
           }
         },
