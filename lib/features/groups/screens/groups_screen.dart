@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/widgets/custom_app_bar.dart';
 import '../bloc/groups_bloc.dart';
+import '../bloc/groups_event.dart';
 import '../bloc/groups_state.dart';
 import '../widgets/create_group_bottom_sheet.dart';
+import '../widgets/edit_group_bottom_sheet.dart';
 
 class GroupsScreen extends StatelessWidget {
   final String coachName;
@@ -123,14 +125,79 @@ class GroupsScreen extends StatelessWidget {
                         );
                       }).toList(),
                     ),
-                    trailing: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.people_outline, color: Colors.blueAccent),
-                        Text(
-                          '0 чел',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ), // Заглушка для учеников
+                        const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.people_outline,
+                              color: Colors.blueAccent,
+                            ),
+                            Text(
+                              '0 чел',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                        PopupMenuButton<String>(
+                          onSelected: (value) {
+                            if (value == 'delete') {
+                              context.read<GroupsBloc>().add(
+                                DeleteGroupRequested(
+                                  group['id'],
+                                  group['name'],
+                                ),
+                              );
+                            } else if (value == 'edit') {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(20),
+                                  ),
+                                ),
+                                builder: (context) =>
+                                    EditGroupBottomSheet(group: group),
+                              );
+                            }
+                          },
+                          itemBuilder: (BuildContext context) => [
+                            const PopupMenuItem(
+                              value: 'edit',
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.edit_outlined,
+                                    size: 20,
+                                    color: Colors.black87,
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text('Редактировать'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'delete',
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.delete_outline,
+                                    size: 20,
+                                    color: Colors.redAccent,
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Удалить',
+                                    style: TextStyle(color: Colors.redAccent),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
