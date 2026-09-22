@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/widgets/custom_app_bar.dart';
 import '../bloc/groups_bloc.dart';
@@ -82,6 +83,12 @@ class GroupsScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: ListTile(
+                    onTap: () {
+                      context.push(
+                        '/group/${group['id']}',
+                        extra: group['name'],
+                      );
+                    },
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 8,

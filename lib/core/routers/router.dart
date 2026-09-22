@@ -7,6 +7,8 @@ import '../../features/dashboard/dashboard_screen.dart';
 import '../../features/auth/screens/register_screen.dart';
 import '../../features/auth/screens/recovery_screen.dart';
 import '../../features/auth/screens/otp_screen.dart';
+import '../../features/students/screens/group_details_screen.dart';
+import '../../features/students/screens/incoming_transfers_screen.dart';
 import '../utils/go_router_refresh_stream.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -72,6 +74,19 @@ final GoRouter appRouter = GoRouter(
       builder: (BuildContext context, GoRouterState state) {
         return const UpdatePasswordScreen();
       },
+    ),
+    GoRoute(
+      path: '/group/:id',
+      builder: (BuildContext context, GoRouterState state) {
+        final groupId = state.pathParameters['id']!;
+        final groupName = state.extra as String? ?? 'Группа';
+        return GroupDetailsScreen(groupId: groupId, groupName: groupName);
+      },
+    ),
+    GoRoute(
+      path: '/incoming-transfers',
+      builder: (BuildContext context, GoRouterState state) =>
+          const IncomingTransfersScreen(),
     ),
   ],
 );

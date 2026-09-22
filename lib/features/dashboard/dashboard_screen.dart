@@ -5,9 +5,22 @@ import '../auth/bloc/auth_bloc.dart';
 import '../auth/bloc/auth_state.dart';
 import '../auth/screens/pending_screen.dart';
 import '../groups/screens/groups_screen.dart';
+import '../students/bloc/transfers_bloc.dart';
+import '../students/bloc/transfers_event.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<TransfersBloc>().add(LoadIncomingTransfers());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,14 +33,13 @@ class DashboardScreen extends StatelessWidget {
             return const PendingScreen();
           } else if (state.role == 'admin' || state.role == 'senior_coach') {
             return Scaffold(
-              appBar: CustomAppBar(titleWidget: Text(fullName)), // Выводим имя
+              appBar: CustomAppBar(titleWidget: Text(fullName)),
               body: const Center(child: Text('Панель администратора')),
             );
           } else {
             return GroupsScreen(coachName: fullName);
           }
         }
-
         return const Scaffold(body: Center(child: CircularProgressIndicator()));
       },
     );

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../features/auth/bloc/auth_bloc.dart';
 import '../../features/auth/bloc/auth_event.dart';
+import '../../features/students/bloc/transfers_bloc.dart';
+import '../../features/students/bloc/transfers_state.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget titleWidget;
@@ -13,6 +16,24 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: titleWidget,
       actions: [
+        BlocBuilder<TransfersBloc, TransfersState>(
+          builder: (context, state) {
+            int pendingCount = 0;
+            if (state is TransfersLoaded) {
+              pendingCount = state.transfers.length;
+            }
+            return IconButton(
+              icon: Badge(
+                isLabelVisible: pendingCount > 0,
+                label: Text(pendingCount.toString()),
+                child: const Icon(Icons.notifications_outlined),
+              ),
+              onPressed: () {
+                context.push('/incoming-transfers');
+              },
+            );
+          },
+        ),
         PopupMenuButton<String>(
           onSelected: (value) {
             if (value == 'logout') {
