@@ -16,22 +16,25 @@ class IncomingTransfersScreen extends StatelessWidget {
       ),
       body: BlocBuilder<TransfersBloc, TransfersState>(
         builder: (context, state) {
-          if (state is TransfersLoading)
+          if (state is TransfersLoading) {
             return const Center(child: CircularProgressIndicator());
-          if (state is TransfersError)
+          }
+          if (state is TransfersError) {
             return Center(
               child: Text(
                 state.message,
                 style: const TextStyle(color: Colors.red),
               ),
             );
+          }
 
           if (state is TransfersLoaded) {
             final transfers = state.transfers;
-            if (transfers.isEmpty)
+            if (transfers.isEmpty) {
               return const Center(
                 child: Text('Нет входящих заявок на перевод.'),
               );
+            }
 
             return ListView.builder(
               padding: const EdgeInsets.all(16),

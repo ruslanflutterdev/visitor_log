@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../core/widgets/custom_app_bar.dart';
+import '../admin/screens/admin_dashboard_screen.dart';
 import '../auth/bloc/auth_bloc.dart';
 import '../auth/bloc/auth_state.dart';
 import '../auth/screens/pending_screen.dart';
@@ -32,10 +32,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           if (state.role == 'pending') {
             return const PendingScreen();
           } else if (state.role == 'admin' || state.role == 'senior_coach') {
-            return Scaffold(
-              appBar: CustomAppBar(titleWidget: Text(fullName)),
-              body: const Center(child: Text('Панель администратора')),
-            );
+            return AdminDashboardScreen(adminName: fullName);
           } else {
             return GroupsScreen(coachName: fullName);
           }

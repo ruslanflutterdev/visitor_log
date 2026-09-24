@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../features/admin/screens/admin_audit_logs_screen.dart';
+import '../../features/admin/screens/admin_coaches_screen.dart';
+import '../../features/admin/screens/admin_statistics_screen.dart';
+import '../../features/admin/screens/admin_students_screen.dart';
 import '../../features/auth/screens/auth_screen.dart';
 import '../../features/auth/screens/update_password_screen.dart';
 import '../../features/dashboard/dashboard_screen.dart';
@@ -87,6 +91,22 @@ final GoRouter appRouter = GoRouter(
       path: '/incoming-transfers',
       builder: (BuildContext context, GoRouterState state) =>
           const IncomingTransfersScreen(),
+    ),
+    GoRoute(
+      path: '/admin/coaches',
+      builder: (context, state) => const AdminCoachesScreen(),
+    ),
+    GoRoute(
+      path: '/admin/students',
+      builder: (context, state) => const AdminStudentsScreen(),
+    ),
+    GoRoute(
+      path: '/admin/statistics',
+      builder: (context, state) => const AdminStatisticsScreen(),
+    ),
+    GoRoute(
+      path: '/admin/audit-logs',
+      builder: (context, state) => const AdminAuditLogsScreen(),
     ),
   ],
 );

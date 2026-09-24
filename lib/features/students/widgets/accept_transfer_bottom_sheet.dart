@@ -54,8 +54,9 @@ class _AcceptTransferBottomSheetState extends State<AcceptTransferBottomSheet> {
           BlocBuilder<GroupsBloc, GroupsState>(
             builder: (context, state) {
               if (state is GroupsLoaded) {
-                if (state.groups.isEmpty)
+                if (state.groups.isEmpty) {
                   return const Text('У вас нет созданных групп!');
+                }
                 return DropdownButtonFormField<String>(
                   decoration: const InputDecoration(
                     labelText: 'Выберите группу',
