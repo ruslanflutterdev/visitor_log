@@ -13,7 +13,7 @@ class AppConstants {
     'Группа 11',
     'Группа 12',
     'Группа 13',
-    'Группа 14'
+    'Группа 14',
   ];
 
   static const List<String> weekDays = [

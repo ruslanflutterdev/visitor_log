@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/bloc/auth_bloc.dart';
 import '../../features/auth/bloc/auth_event.dart';
+import '../../features/auth/bloc/auth_state.dart';
 import '../../features/students/bloc/transfers_bloc.dart';
 import '../../features/students/bloc/transfers_state.dart';
 
@@ -16,30 +17,42 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: titleWidget,
       actions: [
-        BlocBuilder<TransfersBloc, TransfersState>(
-          builder: (context, state) {
-            int pendingCount = 0;
-            if (state is TransfersLoaded) {
-              pendingCount = state.transfers.length;
+        BlocBuilder<AuthBloc, AuthBlocState>(
+          builder: (context, authState) {
+            bool isAdmin = false;
+            if (authState is AuthAuthenticated) {
+              isAdmin =
+                  authState.role == 'admin' || authState.role == 'senior_coach';
             }
-            return IconButton(
-              icon: Badge(
-                isLabelVisible: pendingCount > 0,
-                label: Text(pendingCount.toString()),
-                child: const Icon(Icons.notifications_outlined),
-              ),
-              onPressed: () {
-                context.push('/incoming-transfers');
+
+            if (isAdmin) return const SizedBox.shrink();
+
+            return BlocBuilder<TransfersBloc, TransfersState>(
+              builder: (context, state) {
+                int pendingCount = 0;
+                if (state is TransfersLoaded) {
+                  pendingCount = state.transfers.length;
+                }
+                return IconButton(
+                  icon: Badge(
+                    isLabelVisible: pendingCount > 0,
+                    label: Text(pendingCount.toString()),
+                    child: const Icon(Icons.notifications_outlined),
+                  ),
+                  onPressed: () => context.push('/incoming-transfers'),
+                );
               },
             );
           },
         ),
         PopupMenuButton<String>(
           onSelected: (value) {
-            if (value == 'logout') {
+            if (value == 'settings') {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Настройки в разработке')),
+              );
+            } else if (value == 'logout') {
               context.read<AuthBloc>().add(AuthSignOutRequested());
-            } else if (value == 'settings') {
-              // TODO: Навигация на экран настроек
             }
           },
           itemBuilder: (BuildContext context) => [
@@ -47,9 +60,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               value: 'settings',
               child: Row(
                 children: [
-                  Icon(Icons.settings_outlined, color: Colors.black87),
+                  Icon(Icons.settings, color: Colors.black87),
                   SizedBox(width: 8),
-                  Text('Настройки'),
+                  Text('Настройки', style: TextStyle(color: Colors.black87)),
                 ],
               ),
             ),

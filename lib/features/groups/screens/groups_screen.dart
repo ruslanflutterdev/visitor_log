@@ -9,10 +9,21 @@ import '../bloc/groups_state.dart';
 import '../widgets/create_group_bottom_sheet.dart';
 import '../widgets/edit_group_bottom_sheet.dart';
 
-class GroupsScreen extends StatelessWidget {
+class GroupsScreen extends StatefulWidget {
   final String coachName;
 
   const GroupsScreen({super.key, required this.coachName});
+
+  @override
+  State<GroupsScreen> createState() => _GroupsScreenState();
+}
+
+class _GroupsScreenState extends State<GroupsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<GroupsBloc>().add(LoadGroups());
+  }
 
   void _showCreateGroupSheet(BuildContext context) {
     showModalBottomSheet(
@@ -29,7 +40,10 @@ class GroupsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        titleWidget: Text(coachName, style: const TextStyle(fontSize: 18)),
+        titleWidget: Text(
+          widget.coachName,
+          style: const TextStyle(fontSize: 18),
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showCreateGroupSheet(context),
@@ -65,7 +79,7 @@ class GroupsScreen extends StatelessWidget {
                 final group = groups[index];
                 final schedules =
                     group['group_schedules'] as List<dynamic>? ?? [];
-
+                final students = group['students'] as List? ?? [];
                 final Map<String, List<String>> timeGroups = {};
                 for (var s in schedules) {
                   final start = s['start_time'].toString().substring(0, 5);
@@ -135,16 +149,18 @@ class GroupsScreen extends StatelessWidget {
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Column(
+                        Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.people_outline,
                               color: Colors.blueAccent,
                             ),
                             Text(
-                              '0 чел',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              '${students.length} чел',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),

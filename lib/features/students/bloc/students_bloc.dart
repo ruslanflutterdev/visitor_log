@@ -13,7 +13,7 @@ class StudentsBloc extends Bloc<StudentsEvent, StudentsState> {
     on<InitiateTransferRequested>(_onInitiateTransfer);
   }
 
-  Future<void> _logAction(String actionType, String details) async {
+  Future _logAction(String actionType, String details) async {
     final userId = _supabase.auth.currentUser!.id;
     await _supabase.from('audit_logs').insert({
       'coach_id': userId,
@@ -22,7 +22,7 @@ class StudentsBloc extends Bloc<StudentsEvent, StudentsState> {
     });
   }
 
-  Future<void> _onLoadStudents(
+  Future _onLoadStudents(
     LoadStudents event,
     Emitter<StudentsState> emit,
   ) async {
@@ -39,18 +39,23 @@ class StudentsBloc extends Bloc<StudentsEvent, StudentsState> {
     }
   }
 
-  Future<void> _onAddStudents(
+  Future _onAddStudents(
     AddStudentsRequested event,
     Emitter<StudentsState> emit,
   ) async {
     emit(StudentsLoading());
     try {
-      final userId = _supabase.auth.currentUser!.id;
+      final groupInfo = await _supabase
+          .from('groups')
+          .select('coach_id')
+          .eq('id', event.groupId)
+          .single();
+      final targetCoachId = groupInfo['coach_id'];
 
       final studentsData = event.students
           .map(
             (s) => {
-              'coach_id': userId,
+              'coach_id': targetCoachId,
               'group_id': event.groupId,
               'first_name': s.firstName.text.trim(),
               'last_name': s.lastName.text.trim(),
@@ -75,7 +80,7 @@ class StudentsBloc extends Bloc<StudentsEvent, StudentsState> {
     }
   }
 
-  Future<void> _onDeleteStudent(
+  Future _onDeleteStudent(
     DeleteStudentRequested event,
     Emitter<StudentsState> emit,
   ) async {
@@ -94,14 +99,12 @@ class StudentsBloc extends Bloc<StudentsEvent, StudentsState> {
     }
   }
 
-  Future<void> _onInitiateTransfer(
+  Future _onInitiateTransfer(
     InitiateTransferRequested event,
     Emitter<StudentsState> emit,
   ) async {
     emit(StudentsLoading());
     try {
-      final userId = _supabase.auth.currentUser!.id;
-
       final existing = await _supabase
           .from('student_transfers')
           .select()
@@ -116,9 +119,16 @@ class StudentsBloc extends Bloc<StudentsEvent, StudentsState> {
         return;
       }
 
+      final studentInfo = await _supabase
+          .from('students')
+          .select('coach_id')
+          .eq('id', event.studentId)
+          .single();
+      final currentCoachId = studentInfo['coach_id'];
+
       await _supabase.from('student_transfers').insert({
         'student_id': event.studentId,
-        'from_coach_id': userId,
+        'from_coach_id': currentCoachId,
         'to_coach_id': event.toCoachId,
       });
 
@@ -128,7 +138,7 @@ class StudentsBloc extends Bloc<StudentsEvent, StudentsState> {
       );
 
       emit(const StudentActionSuccess('Заявка на перевод успешно отправлена!'));
-      add(LoadStudents(event.groupId)); // Обновляем список (появится статус)
+      add(LoadStudents(event.groupId));
     } catch (e) {
       emit(StudentsError('Ошибка перевода: $e'));
     }

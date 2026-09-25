@@ -31,7 +31,7 @@ class GroupsBloc extends Bloc<GroupsEvent, GroupsState> {
       final userId = _supabase.auth.currentUser!.id;
       final data = await _supabase
           .from('groups')
-          .select('*, group_schedules(*)')
+          .select('*, group_schedules(*), students(id)')
           .eq('coach_id', userId);
       emit(GroupsLoaded(data));
     } catch (e) {

@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../admin/bloc/admin_coaches_bloc.dart';
+import '../../admin/bloc/admin_coaches_event.dart';
+import '../../auth/bloc/auth_bloc.dart';
+import '../../auth/bloc/auth_state.dart';
+import '../../groups/bloc/groups_bloc.dart';
+import '../../groups/bloc/groups_event.dart';
+
 import '../bloc/students_bloc.dart';
 import '../bloc/students_event.dart';
 import '../bloc/students_state.dart';
@@ -53,7 +60,20 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         icon: const Icon(Icons.person_add),
         label: const Text('Добавить учеников'),
       ),
-      body: BlocBuilder<StudentsBloc, StudentsState>(
+      body: BlocConsumer<StudentsBloc, StudentsState>(
+        listener: (context, state) {
+          if (state is StudentActionSuccess) {
+            context.read<GroupsBloc>().add(LoadGroups());
+
+            final authState = context.read<AuthBloc>().state;
+            if (authState is AuthAuthenticated &&
+                (authState.role == 'admin' ||
+                    authState.role == 'senior_coach')) {
+              // ЗАМЕНИТЬ [] НА <>
+              context.read<AdminCoachesBloc>().add(LoadAdminCoaches());
+            }
+          }
+        },
         builder: (context, state) {
           if (state is StudentsLoading) {
             return const Center(child: CircularProgressIndicator());
@@ -79,12 +99,15 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               itemCount: students.length,
               itemBuilder: (context, index) {
                 final student = students[index];
-                final fullName =
-                    '${student['last_name']} ${student['first_name']} ${student['middle_name'] ?? ''}'
-                        .trim();
 
-                final transfers =
-                    student['student_transfers'] as List<dynamic>? ?? [];
+                final String lastName = student['last_name'] ?? '';
+                final String firstName = student['first_name'] ?? '';
+                final String middleName = student['middle_name'] ?? '';
+                final String fullName = '$lastName $firstName $middleName'
+                    .trim();
+
+                final List transfers =
+                    student['student_transfers'] as List? ?? [];
                 final isPendingTransfer = transfers.any(
                   (t) => t['status'] == 'pending',
                 );
@@ -110,7 +133,6 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
-                        // НОВОЕ: Плашка, если ученик в процессе перевода
                         if (isPendingTransfer)
                           const Text(
                             ' В переводе',
@@ -123,12 +145,13 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                       ],
                     ),
                     subtitle: Text('Тел: ${student['phone']}'),
-                    // НОВОЕ: Блокируем меню (прячем его), если ученик переводится
                     trailing: isPendingTransfer
                         ? null
+                        // ЗАМЕНИТЬ [] НА <>
                         : PopupMenuButton<String>(
                             onSelected: (value) {
                               if (value == 'delete') {
+                                // ЗАМЕНИТЬ [] НА <>
                                 context.read<StudentsBloc>().add(
                                   DeleteStudentRequested(
                                     student['id'],

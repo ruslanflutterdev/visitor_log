@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../features/admin/screens/admin_audit_logs_screen.dart';
+import '../../features/admin/screens/admin_coach_details_screen.dart';
 import '../../features/admin/screens/admin_coaches_screen.dart';
 import '../../features/admin/screens/admin_statistics_screen.dart';
 import '../../features/admin/screens/admin_students_screen.dart';
@@ -107,6 +108,13 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/admin/audit-logs',
       builder: (context, state) => const AdminAuditLogsScreen(),
+    ),
+    GoRoute(
+      path: '/admin/coach/:id',
+      builder: (context, state) {
+        final coach = state.extra as Map;
+        return AdminCoachDetailsScreen(coach: coach);
+      },
     ),
   ],
 );
